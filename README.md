@@ -19,6 +19,10 @@
 
 ![总览](media/overview.png)
 
+> 下面这张就是 GitHub Pages 上的实拍（无头浏览器打开线上地址截图，0 报错、0 请求失败）：
+>
+> ![线上实拍](media/github-pages.png)
+
 | 上扑收拢（折叠翼 55%） | 下扑全展 |
 |---|---|
 | ![折叠](media/wing-folded.png) | ![展开](media/wing-extended.png) |
