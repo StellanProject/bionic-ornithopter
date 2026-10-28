@@ -1,0 +1,19 @@
+{
+  "name": "bionic-ornithopter",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "ORNI-X — 网页版 3D 仿生扑翼飞行器实时仿真（BLDC + 曲柄摇杆 + 叶素气动 + 六自由度刚体）",
+  "scripts": {
+    "serve": "python3 -m http.server 8137 --bind 127.0.0.1",
+    "test": "node tests/physics.test.mjs",
+    "shot": "node tools/qa-shot.mjs"
+  },
+  "dependencies": {
+    "cannon-es": "^0.20.0",
+    "three": "^0.167.1"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.49.1"
+  }
+}

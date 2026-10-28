@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+*.log
+tests/shots/
+tests/shots/frames*/
+frames/
+frames2/
+.venv/

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>ORNI-X · 仿生扑翼飞行器实时仿真</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%233fe0ff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%233fe0ff'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="./styles.css" />
+<script type="importmap">
+{ "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+} }
+</script>
+</head>
+<body>
+<canvas id="scene"></canvas>
+<div id="vignette"></div>
+
+<header id="topbar">
+  <div class="brand">
+    <div class="logo"><span></span></div>
+    <div class="brand-text">
+      <h1>ORNI&#8209;X <em>仿生扑翼飞行器</em></h1>
+      <p>无刷电机驱动 · 曲柄摇杆扑动 · 叶素气动 · 六自由度刚体</p>
+    </div>
+  </div>
+  <div class="top-actions">
+    <div class="stat-chip"><i class="dot live"></i><span id="chip-fps">60</span> FPS</div>
+    <button class="btn ghost" id="btn-help">原理 / 帮助</button>
+  </div>
+</header>
+
+<aside class="panel" id="panel-left">
+  <div class="panel-scroll" id="left-scroll"></div>
+</aside>
+
+<aside class="panel right" id="panel-right">
+  <div class="panel-scroll">
+    <section class="card hero-card">
+      <div class="card-head"><h2>飞行遥测</h2><span class="tag" id="chip-mode">悬停辅助</span></div>
+      <div class="hero-grid">
+        <div class="hero-item"><span class="k">升重比 L/W</span><b id="t-lw">--</b></div>
+        <div class="hero-item"><span class="k">高度</span><b id="t-alt">--</b><small>m</small></div>
+        <div class="hero-item"><span class="k">垂直速度</span><b id="t-vy">--</b><small>m/s</small></div>
+        <div class="hero-item"><span class="k">空速</span><b id="t-ias">--</b><small>m/s</small></div>
+      </div>
+      <div class="bars">
+        <div class="bar-row"><span>升力</span><div class="bar"><i id="bar-lift" class="lift"></i><em id="bar-wline"></em></div><b id="t-lift">--</b></div>
+        <div class="bar-row"><span>推力</span><div class="bar"><i id="bar-thrust" class="thrust"></i></div><b id="t-thrust">--</b></div>
+        <div class="bar-row"><span>阻力</span><div class="bar"><i id="bar-drag" class="drag"></i></div><b id="t-drag">--</b></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>动力系统 · BLDC</h2><span class="tag amber" id="chip-sector">A+B-</span></div>
+      <div class="kv-grid">
+        <div><span class="k">转速</span><b id="t-rpm">--</b><small>rpm</small></div>
+        <div><span class="k">相电流</span><b id="t-amp">--</b><small>A</small></div>
+        <div><span class="k">母线电压</span><b id="t-volt">--</b><small>V</small></div>
+        <div><span class="k">电功率</span><b id="t-pwr">--</b><small>W</small></div>
+        <div><span class="k">电机效率</span><b id="t-eff">--</b><small>%</small></div>
+        <div><span class="k">温升</span><b id="t-temp">--</b><small>°C</small></div>
+        <div><span class="k">扑动频率</span><b id="t-flap">--</b><small>Hz</small></div>
+        <div><span class="k">曲柄力矩</span><b id="t-torque">--</b><small>N·m</small></div>
+      </div>
+      <div class="soc-wrap">
+        <span class="k">电池</span>
+        <div class="soc"><i id="soc-fill"></i></div>
+        <b id="t-soc">100%</b>
+        <span class="k">续航</span><b id="t-endurance">--</b>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>气动 · 叶素</h2><span class="tag" id="chip-alpha">α 0°</span></div>
+      <div class="kv-grid tight">
+        <div><span class="k">翼尖速度</span><b id="t-tip">--</b><small>m/s</small></div>
+        <div><span class="k">扑动角</span><b id="t-flapdeg">--</b><small>°</small></div>
+        <div><span class="k">桨距角</span><b id="t-pitchdeg">--</b><small>°</small></div>
+        <div><span class="k">气动功率</span><b id="t-aeropw">--</b><small>W</small></div>
+        <div><span class="k">上扑折叠</span><b id="t-fold">--</b><small>%</small></div>
+        <div><span class="k">悬停油门估计</span><b id="t-hoveru">--</b><small>-</small></div>
+        <div><span class="k">俯仰</span><b id="t-pitch">--</b><small>°</small></div>
+        <div><span class="k">滚转</span><b id="t-roll">--</b><small>°</small></div>
+      </div>
+      <canvas id="polar" width="540" height="300"></canvas>
+      <p class="cap">极曲线 CL / CD — 光点为当前翼型工作点</p>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>三相换向示波器</h2><span class="tag amber" id="chip-pwm">PWM 0%</span></div>
+      <canvas id="scope" width="540" height="230"></canvas>
+      <p class="cap">上：A/B/C 相电流（六步换向） 下：ESC 油门占空比</p>
+    </section>
+  </div>
+</aside>
+
+<div id="dock">
+  <div class="dock-group">
+    <button class="btn mode active" data-mode="hover">悬停辅助</button>
+    <button class="btn mode" data-mode="free">自由飞行</button>
+    <button class="btn mode" data-mode="tether">系留测试</button>
+  </div>
+  <div class="dock-sep"></div>
+  <div class="dock-group">
+    <button class="btn" id="btn-launch">起飞</button>
+    <button class="btn" id="btn-wind">风场 0</button>
+    <button class="btn" id="btn-vectors">力矢量</button>
+    <button class="btn" id="btn-cutaway">机构透视</button>
+  </div>
+  <div class="dock-sep"></div>
+  <div class="dock-group">
+    <button class="btn" data-view="orbit">环绕</button>
+    <button class="btn" data-view="follow">跟随</button>
+    <button class="btn" data-view="mech">机构特写</button>
+    <button class="btn" data-view="aero">气动侧视</button>
+  </div>
+  <div class="dock-sep"></div>
+  <div class="dock-group">
+    <button class="btn icon" id="btn-pause" title="暂停 (空格)">❚❚</button>
+    <button class="btn icon" id="btn-reset" title="重置">↺</button>
+  </div>
+</div>
+
+<div id="hint">拖动旋转视角 · 滚轮缩放 · <kbd>W</kbd><kbd>S</kbd> 油门 · <kbd>A</kbd><kbd>D</kbd> 滚转 · <kbd>↑</kbd><kbd>↓</kbd> 俯仰 · <kbd>空格</kbd> 暂停</div>
+
+<div id="help" class="modal hidden">
+  <div class="modal-card">
+    <header><h2>工作原理</h2><button class="btn ghost icon" id="btn-help-close">✕</button></header>
+    <div class="modal-body" id="help-body"></div>
+  </div>
+</div>
+
+<div id="loading"><div class="spinner"></div><p>正在编织翼膜…</p></div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
