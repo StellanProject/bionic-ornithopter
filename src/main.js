@@ -7,6 +7,7 @@ import { buildAirframe } from './airframe.js';
 import { WingMesh } from './wingMesh.js';
 import { Mechanism } from './mechanism.js';
 import { Vfx } from './vfx.js';
+import { Anatomy } from './anatomy.js';
 import { Sim, SUBSTEP } from './sim.js';
 import { UI } from './ui.js';
 import { params } from './config.js';
@@ -34,6 +35,12 @@ const mech = new Mechanism(params);
 craft.add(mech.group);
 
 const vfx = new Vfx(scene, params);
+
+// 解剖演示（爆炸视图 + 分步讲解）
+const anatomy = new Anatomy({
+  craft, airframe, wings, mech, view, camera, controls,
+  onStep: (i, st) => { /* 供 UI 使用 */ },
+});
 
 // 机身内部一盏暖光，制造"机械核心"的感觉
 const coreLight = new THREE.PointLight(0xffb04a, 0.55, 0.9, 2);
@@ -77,6 +84,17 @@ const ui = new UI({
       if (da) { da.input.value = 2.0; da.input.dispatchEvent(new Event('input')); }
     },
     setCutaway(v) { airframe.setCutaway(v); },
+    toggleAnatomy() {
+      if (anatomy.active) {
+        anatomy.exit();
+        ui.state.anatomy = false;
+        ui.setPaused(false);
+      } else {
+        ui.state.anatomy = true;
+        ui.setPaused(true);
+        anatomy.enter();
+      }
+    },
     setView(v) { presetView(v); },
   },
 });
@@ -206,18 +224,22 @@ function applyVisuals(dtReal, now, simDt, studio) {
   craft.position.set(b.position.x, b.position.y, b.position.z);
   craft.quaternion.set(b.quaternion.x, b.quaternion.y, b.quaternion.z, b.quaternion.w);
 
-  const ctl = sim.ctl || { flap: 0, psi: 0 };
-  const phaseRad = ((params.phaseDeg || 0) * Math.PI) / 180;
-  for (const w of wings) w.update(sim.crank + (w.sign < 0 ? phaseRad : 0), 1, sim.wingLoad);
-  mech.update(sim.crank, sim.crank + phaseRad, sim.ctlR || ctl, sim.ctlL || ctl,
-    sim.dt.omegaCrank * sim.dt.G, simDt);
+  const frozen = !!ui.state.anatomy;
+  if (!frozen) {
+    const ctl = sim.ctl || { flap: 0, psi: 0 };
+    const phaseRad = ((params.phaseDeg || 0) * Math.PI) / 180;
+    for (const w of wings) w.update(sim.crank + (w.sign < 0 ? phaseRad : 0), 1, sim.wingLoad);
+    mech.update(sim.crank, sim.crank + phaseRad, sim.ctlR || ctl, sim.ctlL || ctl,
+      sim.dt.omegaCrank * sim.dt.G, simDt);
+  }
 
   sun.position.set(craft.position.x + 3.2, craft.position.y + 5.0, craft.position.z + 2.6);
   sun.target.position.copy(craft.position);
   sun.target.updateMatrixWorld();
 
   vfx.update(simDt, now / 1000, craft, sim, sim.tele);
-  if (!studio) updateCamera(dtReal, now);
+  anatomy.update(dtReal);
+  if (!studio && !frozen) updateCamera(dtReal, now);
 
   hudTimer += dtReal;
   if (hudTimer > 0.08) { hudTimer = 0; ui.updateHud(sim.tele, fps); }

@@ -126,6 +126,7 @@ export class WingMesh {
       emissiveIntensity: 0.10,
     });
     this.membrane = new THREE.Mesh(this._membraneGeometry(), this.membraneMat);
+    this.membrane.name = 'membrane' + (sign > 0 ? 'R' : 'L');
     this.membrane.castShadow = false;
     this.membrane.receiveShadow = false;
     this.membrane.frustumCulled = false;
@@ -134,6 +135,7 @@ export class WingMesh {
 
     this.sparMat = new THREE.MeshStandardMaterial({ color: 0x161c24, metalness: 0.6, roughness: 0.34 });
     this.spar = createTube(this.NS, 7, this.sparMat);
+    this.spar.mesh.name = 'spar' + (sign > 0 ? 'R' : 'L');
     this.spar.mesh.castShadow = true;
     this.group.add(this.spar.mesh);
 
@@ -149,6 +151,7 @@ export class WingMesh {
     }
     // 翼尖爪
     this.claw = new THREE.Mesh(new THREE.ConeGeometry(0.007, 0.045, 7), this.tipMat);
+    this.claw.name = 'claw' + (sign > 0 ? 'R' : 'L');
     this.group.add(this.claw);
 
     // 翼根接头

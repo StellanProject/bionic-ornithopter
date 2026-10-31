@@ -112,7 +112,7 @@ export class UI {
     this.actions = actions;
     this.state = {
       throttle: 0.8, altTarget: 1.7, timeScale: 1, mode: 'hover',
-      showVectors: false, cutaway: false, paused: false, view: 'orbit',
+      showVectors: false, cutaway: false, paused: false, view: 'orbit', anatomy: false,
     };
     this.rows = [];
     this.scopeBuf = { A: [], B: [], C: [], pwm: [] };
@@ -266,6 +266,11 @@ export class UI {
       this.actions.setCutaway(this.state.cutaway);
       $('btn-cutaway').classList.toggle('on', this.state.cutaway);
     };
+    const anBtn = $('btn-anatomy');
+    if (anBtn) anBtn.onclick = () => {
+      this.actions.toggleAnatomy();
+      anBtn.classList.toggle('on', this.state.anatomy);
+    };
     $('btn-help').onclick = () => this.toggleHelp(true);
     $('btn-help-close').onclick = () => this.toggleHelp(false);
     $('help').onclick = (e) => { if (e.target.id === 'help') this.toggleHelp(false); };
@@ -301,6 +306,11 @@ export class UI {
     this.state.view = v;
     document.querySelectorAll('[data-view]').forEach((b) => b.classList.toggle('active', b.dataset.view === v));
     this.actions.setView(v);
+  }
+  setPaused(v) {
+    this.state.paused = v;
+    $('btn-pause').textContent = v ? '▶' : '❚❚';
+    $('btn-pause').classList.toggle('on', v);
   }
   togglePause() {
     this.state.paused = !this.state.paused;

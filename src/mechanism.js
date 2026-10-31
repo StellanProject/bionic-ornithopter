@@ -113,6 +113,7 @@ export class Mechanism {
     mount.position.set(-0.004, -0.019, 0);
     motor.add(mount);
     this.motor = motor;
+    motor.name = 'motor';
     this.group.add(motor);
 
     // ---------------- 同步带 ----------------
@@ -143,6 +144,7 @@ export class Mechanism {
       color: 0x101418, metalness: 0.3, roughness: 0.75,
     }));
     belt.castShadow = true;
+    belt.name = 'belt';
     this.group.add(belt);
     // 同步带齿（沿路径运动）
     this.beltTeeth = [];
@@ -183,6 +185,7 @@ export class Mechanism {
 
     // ---------------- 左右双曲柄摇杆（支持 0~180° 对置相位） ----------------
     this.crankDisc = new THREE.Group();
+    this.crankDisc.name = 'crankDisc';
     this.crankDisc.position.set(-0.012, this.O2.v, this.O2.u);
     const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.0125, 0.0125, 0.005, 22), carbon);
     disc.rotation.z = Math.PI / 2;

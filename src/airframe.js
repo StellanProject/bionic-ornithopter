@@ -70,6 +70,7 @@ export function buildAirframe() {
 
   // ---------- 碳纤维骨架 ----------
   const frame = new THREE.Group();
+  frame.name = 'frame';
   const R = 0.063;
   const xs = [0.20, 0.10, 0.0, -0.10, -0.20, -0.29];
   for (const ang of [Math.PI * 0.25, Math.PI * 0.75, Math.PI * 1.25, Math.PI * 1.75]) {
@@ -111,6 +112,7 @@ export function buildAirframe() {
     clearcoat: 0.55, clearcoatRoughness: 0.22, sheen: 0.8, sheenColor: new THREE.Color(0x63c8ff),
   });
   const skin = new THREE.Mesh(skinGeo, skinMat);
+  skin.name = 'skin';
   skin.renderOrder = 3;
   group.add(skin);
 
@@ -125,6 +127,7 @@ export function buildAirframe() {
   const nose = new THREE.Mesh(noseGeo, new THREE.MeshStandardMaterial({
     color: 0x232b35, metalness: 0.65, roughness: 0.26, envMapIntensity: 1.2,
   }));
+  nose.name = 'nose';
   nose.position.x = 0.19;
   nose.castShadow = true;
   group.add(nose);
@@ -149,6 +152,7 @@ export function buildAirframe() {
     side: THREE.DoubleSide, depthWrite: false,
   });
   const canopy = new THREE.Mesh(canopyGeo, canopyMat);
+  canopy.name = 'canopy';
   canopy.scale.set(1.28, 0.86, 0.72);
   canopy.position.set(0.10, 0.020, 0);
   canopy.rotation.z = -0.06;
@@ -185,6 +189,7 @@ export function buildAirframe() {
 
   // ---------- 尾撑 + V 尾 ----------
   const tail = new THREE.Group();
+  tail.name = 'tail';
   const tipY = 0.045, tipZ = 0.165, tipX = -0.545;
   for (const s of [1, -1]) {
     const a = new THREE.Vector3(-0.28, 0.012, s * 0.03);
@@ -238,6 +243,7 @@ export function buildAirframe() {
 
   // ---------- 机载电子（电池 / ESC / 飞控） ----------
   const avionics = new THREE.Group();
+  avionics.name = 'avionics';
   const batt = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.032, 0.062), new THREE.MeshStandardMaterial({
     color: 0x101820, metalness: 0.35, roughness: 0.55,
   }));

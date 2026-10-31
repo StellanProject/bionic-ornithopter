@@ -164,3 +164,41 @@ kbd{font-family:var(--mono);font-size:9.5px;padding:1px 4px;border-radius:4px;ma
   #panel-left{transform:translateX(-320px)} .panel.right{transform:translateX(320px)}
   #dock{transform:translateX(-50%) scale(.9)}
 }
+
+/* ---------- 解剖演示 ---------- */
+#anatomy-labels{position:fixed;inset:0;pointer-events:none;z-index:18;display:none}
+.an-label{position:absolute;left:0;top:0;padding:6px 10px;border-radius:9px;
+  background:rgba(7,12,19,.86);border:1px solid rgba(63,224,255,.38);
+  box-shadow:0 6px 22px rgba(0,0,0,.5),0 0 18px rgba(63,224,255,.12);
+  backdrop-filter:blur(8px);max-width:230px;transition:opacity .2s}
+.an-label::before{content:'';position:absolute;left:-5px;top:50%;width:5px;height:5px;border-radius:50%;
+  background:var(--cyan);box-shadow:0 0 8px var(--cyan);transform:translateY(-50%)}
+.an-label b{display:block;font-size:11.5px;color:#eafcff;letter-spacing:.02em}
+.an-label span{display:block;font-size:10px;color:#8fb6cc;margin-top:2px;line-height:1.35}
+
+#anatomy-panel{position:fixed;left:16px;top:88px;width:392px;z-index:19;
+  padding:14px 16px 12px;border-radius:16px;background:rgba(9,14,21,.9);
+  border:1px solid rgba(110,190,255,.18);backdrop-filter:blur(16px);
+  box-shadow:0 20px 60px rgba(0,0,0,.55);transition:opacity .25s,transform .25s}
+#anatomy-panel.hidden{opacity:0;pointer-events:none;transform:translateX(-14px)}
+.an-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.an-badge{font-size:10px;letter-spacing:.14em;color:#051019;background:var(--cyan);
+  padding:2px 7px;border-radius:6px;font-weight:700}
+.an-head h3{font-size:14px;font-weight:600;color:#eafcff;line-height:1.3}
+#an-text{font-size:12px;line-height:1.7;color:#b3c6d8;margin-bottom:10px;
+  min-height:84px;white-space:normal}
+.an-parts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.an-chip{font-size:10px;padding:3px 8px;border-radius:6px;color:var(--cyan);
+  background:rgba(63,224,255,.10);border:1px solid rgba(63,224,255,.28)}
+.an-bar{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.an-bar .btn{flex:1;padding:7px 0;text-align:center}
+.an-step{font-family:var(--mono);font-size:11px;color:var(--dim);min-width:34px;text-align:center}
+.an-explode{display:flex;align-items:center;gap:8px;font-size:10.5px;color:var(--dim)}
+.an-explode input{flex:1}
+.an-explode span{font-family:var(--mono);color:var(--cyan);width:36px;text-align:right}
+body.anatomy #panel-left{display:none}
+body.anatomy #panel-right{opacity:.35;pointer-events:none}
+body.anatomy #hint{opacity:0}
+.btn.accent{border-color:rgba(63,224,255,.5);color:#dff6ff;
+  background:linear-gradient(180deg,rgba(24,58,78,.9),rgba(12,26,38,.9))}
+
